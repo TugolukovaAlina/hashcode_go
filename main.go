@@ -53,8 +53,25 @@ func (c Car) String() string {
 	for _, r := range c.assignRoutes {
 		s += fmt.Sprint(r.id, " ")
 	}
-	s += fmt.Sprint(c.finishTime, " ")
 	return s
+}
+
+func (c *Car) addPotentialRoute(r Route) (potentialDepartureTime, potentialMoney int) {
+
+	potentialMoney = 0
+
+	//arrival time at the beginning of the route
+	taxiReadyTime := c.finishTime + distance(c.finishPoint, r.startPoint)
+	potentialDepartureTime = taxiReadyTime
+	if taxiReadyTime <= r.earliestStart {
+		potentialMoney += bonus
+		potentialDepartureTime = r.earliestStart
+	}
+
+	if potentialDepartureTime+r.getDistance() < r.latestEnd {
+		potentialMoney += r.getDistance()
+	}
+	return
 }
 
 func (c *Car) addRoute(r Route) {

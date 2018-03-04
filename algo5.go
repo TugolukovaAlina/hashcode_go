@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"sort"
 )
 
@@ -13,30 +14,19 @@ func Algo5() {
 	for len(carsCopy) > 0 {
 		//find which car finishes first and assing it the route
 
-		sort.Slice(carsCopy, func(i, j int) bool {
-			return carsCopy[i].finishTime < carsCopy[j].finishTime
-		})
+		sort.Slice(carsCopy, func(i, j int) bool { return carsCopy[i].finishTime < carsCopy[j].finishTime })
 
 		idCar := carsCopy[0].id
 
-		maxAlpha := 0.0
+		minPotentialStart := math.MaxInt64
 		idRoute := -1
 		for id, r := range routes {
 
 			car := carsCopy[0]
-			timeBefore := car.finishTime
-			moneyBefore := car.totalMoney
-			car.addRoute(r)
-			timeAfter := car.finishTime
-			moneyAfter := car.totalMoney
+			potentialStart, potentialMoney := car.addPotentialRoute(r)
 
-			alpha := float64(r.getDistance()) / float64((timeAfter - timeBefore))
-			//alpha := float64(timeAfter - timeBefore - r.getDistance())
-
-			//fmt.Println(alpha)
-
-			if alpha > maxAlpha && moneyAfter > moneyBefore {
-				maxAlpha = alpha
+			if potentialStart < minPotentialStart && potentialMoney > 0 {
+				minPotentialStart = potentialStart
 				idRoute = id
 			}
 		}
@@ -47,8 +37,6 @@ func Algo5() {
 		} else {
 			//delete car if no route can be added
 			carsCopy = carsCopy[1:]
-			//carsCopy = append(carsCopy[:idCar], carsCopy[idCar+1:]...)
-			//fmt.Println(len(carsCopy))
 		}
 	}
 	evaluateAlgo()
