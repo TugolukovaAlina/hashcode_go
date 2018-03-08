@@ -18,17 +18,33 @@ func Algo5() {
 
 		idCar := carsCopy[0].id
 
+		//try choose n with min potential start and then choose the biggest money
 		minPotentialStart := math.MaxInt64
+		maxPotentialMoney := 0
+		//maxCost := 0.0
 		idRoute := -1
 		for id, r := range routes {
 
 			car := carsCopy[0]
-			potentialStart, potentialMoney := car.addPotentialRoute(r)
+			potentialStart, potentialMoney, _ := car.addPotentialRoute(r)
+			//_, _, cost := car.addPotentialRoute(r)
+
+			/*
+				if maxCost < cost && cost > 0 {
+					maxCost = cost
+					idRoute = id
+				}*/
 
 			if potentialStart < minPotentialStart && potentialMoney > 0 {
 				minPotentialStart = potentialStart
+				maxPotentialMoney = potentialMoney
+				idRoute = id
+			} else if potentialStart == minPotentialStart && potentialMoney > maxPotentialMoney {
+				maxPotentialMoney = potentialMoney
 				idRoute = id
 			}
+
+			//check if there is other car that can start earlier
 		}
 		if idRoute != -1 {
 			cars[idCar].addRoute(routes[idRoute])

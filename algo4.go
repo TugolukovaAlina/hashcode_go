@@ -2,47 +2,43 @@ package main
 
 import (
 	"math"
-	"sort"
 )
 
-// Algo1 jjj
 func Algo4() {
-	//sort routes by earliest date
-	sort.Slice(routes, func(i, j int) bool {
-		//return routes[i].getDistance() > routes[j].getDistance()
-		return routes[i].earliestStart < routes[j].earliestStart
-	})
-	for _, r := range routes {
-		//find which car finishes first and assing it the route
 
-		carsCopy := make([]Car, len(cars))
-		copy(carsCopy, cars)
+	carsCopy := make([]Car, len(cars))
+	copy(carsCopy, cars)
 
-		bringsMoney := false
+	//fmt.Println(routes)
+	for len(routes) > 0 {
 
-		minDiffTime := math.MaxInt16
-		minDiffTimeId := 0
+		minPotentialStart := math.MaxInt64
+		maxPotentialMoney := 0
+		idRoute := -1
+		idCar := -1
 
-		for i := range carsCopy {
-			//if does not bring money - drop
-			before := carsCopy[i].totalMoney
-			beforeTime := carsCopy[i].finishTime
-			carsCopy[i].addRoute(r)
+		for i := range cars {
+			for j, r := range routes {
+				car := cars[i]
+				potentialStart, potentialMoney, _ := car.addPotentialRoute(r)
 
-			after := carsCopy[i].totalMoney
-			afterTime := carsCopy[i].finishTime
+				if potentialStart < minPotentialStart && potentialMoney > 0 {
+					minPotentialStart = potentialStart
+					maxPotentialMoney = potentialMoney
+					idRoute = j
+					idCar = i
+				} else if potentialStart == minPotentialStart && potentialMoney > maxPotentialMoney {
+					maxPotentialMoney = potentialMoney
+					idRoute = j
+					idCar = i
+				}
 
-			if (afterTime - beforeTime) < minDiffTime {
-				minDiffTimeId = carsCopy[i].id
-				minDiffTime = afterTime - beforeTime
-			}
-			if after > before {
-				bringsMoney = true
 			}
 		}
 
-		if bringsMoney {
-			cars[minDiffTimeId].addRoute(r)
+		if idRoute != -1 {
+			cars[idCar].addRoute(routes[idRoute])
+			routes = append(routes[:idRoute], routes[idRoute+1:]...)
 		}
 	}
 	evaluateAlgo()

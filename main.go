@@ -49,14 +49,14 @@ type Car struct {
 }
 
 func (c Car) String() string {
-	s := fmt.Sprint(c.id, " ")
+	s := fmt.Sprint(len(c.assignRoutes), " ")
 	for _, r := range c.assignRoutes {
 		s += fmt.Sprint(r.id, " ")
 	}
 	return s
 }
 
-func (c *Car) addPotentialRoute(r Route) (potentialDepartureTime, potentialMoney int) {
+func (c *Car) addPotentialRoute(r Route) (potentialDepartureTime, potentialMoney int, costPerSec float64) {
 
 	potentialMoney = 0
 
@@ -71,6 +71,8 @@ func (c *Car) addPotentialRoute(r Route) (potentialDepartureTime, potentialMoney
 	if potentialDepartureTime+r.getDistance() < r.latestEnd {
 		potentialMoney += r.getDistance()
 	}
+	waitingTime := potentialDepartureTime - taxiReadyTime
+	costPerSec = float64(potentialMoney) / float64(distance(c.finishPoint, r.startPoint)+waitingTime+r.getDistance())
 	return
 }
 
